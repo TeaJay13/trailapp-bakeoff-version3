@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "better-auth": "^1.6.18",
     "svelte": "^4.2.18"
   },
   "devDependencies": {
