@@ -8,7 +8,7 @@ import favoriteRoutes from './routes/favoriteRoutes.js'
 const app = new Hono()
 
 app.use('*', cors({
-  origin: process.env.CLIENT_URL || process.env.URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || process.env.BETTER_AUTH_URL || 'http://localhost:5173',
   credentials: true,
 }))
 
