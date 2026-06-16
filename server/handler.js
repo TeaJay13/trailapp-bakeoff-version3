@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { handle } from 'hono/netlify'
+import { handle } from 'hono/aws-lambda'
 import { auth } from './config/auth.js'
 import trailRoutes from './routes/trailRoutes.js'
 import favoriteRoutes from './routes/favoriteRoutes.js'
