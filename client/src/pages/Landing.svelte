@@ -78,9 +78,24 @@
   /* ── Hero ── */
   .hero {
     background: var(--green-dark);
+    background-image: url('/Sunset-Hero-Sml.webp');
+    background-size: cover;
+    background-position: center;
     padding: 5rem 1.5rem 4.5rem;
     text-align: center;
     border-bottom: 3px solid var(--green-accent);
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 30, 12, 0.62);
+  }
+
+  .hero-inner {
+    position: relative;
   }
 
   .hero-inner {
@@ -90,6 +105,7 @@
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
+    position: relative;
   }
 
   .hero-icon {
@@ -239,6 +255,10 @@
   }
 
   /* ── Responsive ── */
+  @media (min-width: 768px) {
+    .hero { background-image: url('/Sunset-Hero.webp'); }
+  }
+
   @media (max-width: 768px) {
     .hero { padding: 3.5rem 1.25rem 3rem; }
     .hero-title { font-size: 2rem; }
