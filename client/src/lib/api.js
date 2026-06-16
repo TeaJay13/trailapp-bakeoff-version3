@@ -1,4 +1,5 @@
-const BASE = '/api/trails'
+const API = import.meta.env.VITE_API_URL || ''
+const BASE = `${API}/api/trails`
 
 const opts = (method, data) => ({
   method,
@@ -39,13 +40,13 @@ export const deleteReview = (trailId, reviewId) =>
   fetch(`${BASE}/${trailId}/reviews/${reviewId}`, opts('DELETE')).then(r => r.json())
 
 export const fetchFavoriteIds = () =>
-  fetch('/api/favorites/ids', { credentials: 'include' }).then(r => r.json())
+  fetch(`${API}/api/favorites/ids`, { credentials: 'include' }).then(r => r.json())
 
 export const fetchFavorites = () =>
-  fetch('/api/favorites', { credentials: 'include' }).then(r => r.json())
+  fetch(`${API}/api/favorites`, { credentials: 'include' }).then(r => r.json())
 
 export const addFavorite = (trailId) =>
-  fetch(`/api/favorites/${trailId}`, opts('POST')).then(r => r.json())
+  fetch(`${API}/api/favorites/${trailId}`, opts('POST')).then(r => r.json())
 
 export const removeFavorite = (trailId) =>
-  fetch(`/api/favorites/${trailId}`, opts('DELETE')).then(r => r.json())
+  fetch(`${API}/api/favorites/${trailId}`, opts('DELETE')).then(r => r.json())
