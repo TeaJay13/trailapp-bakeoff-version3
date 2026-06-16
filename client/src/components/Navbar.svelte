@@ -15,7 +15,13 @@
 </script>
 
 <nav class="navbar">
-  <button class="brand" on:click={goHome}>🥾 TrailFinder</button>
+  <button class="brand" on:click={goHome}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="22 12 17 2 12 12 7 6 2 12"/>
+      <line x1="2" y1="20" x2="22" y2="20"/>
+    </svg>
+    TrailFinder
+  </button>
   <div class="nav-actions">
     {#if $session.isPending}
       <span class="nav-loading">...</span>
