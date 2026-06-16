@@ -31,3 +31,21 @@ export const fetchReviews = (trailId) =>
 
 export const createReview = (trailId, data) =>
   fetch(`${BASE}/${trailId}/reviews`, opts('POST', data)).then(r => r.json())
+
+export const updateReview = (trailId, reviewId, data) =>
+  fetch(`${BASE}/${trailId}/reviews/${reviewId}`, opts('PUT', data)).then(r => r.json())
+
+export const deleteReview = (trailId, reviewId) =>
+  fetch(`${BASE}/${trailId}/reviews/${reviewId}`, opts('DELETE')).then(r => r.json())
+
+export const fetchFavoriteIds = () =>
+  fetch('/api/favorites/ids', { credentials: 'include' }).then(r => r.json())
+
+export const fetchFavorites = () =>
+  fetch('/api/favorites', { credentials: 'include' }).then(r => r.json())
+
+export const addFavorite = (trailId) =>
+  fetch(`/api/favorites/${trailId}`, opts('POST')).then(r => r.json())
+
+export const removeFavorite = (trailId) =>
+  fetch(`/api/favorites/${trailId}`, opts('DELETE')).then(r => r.json())

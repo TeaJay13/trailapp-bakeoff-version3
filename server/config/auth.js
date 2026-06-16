@@ -3,7 +3,15 @@ import { Pool } from 'pg'
 
 export const auth = betterAuth({
   database: new Pool({ connectionString: process.env.DATABASE_URL }),
-  emailAndPassword: {
-    enabled: true,
+  emailAndPassword: { enabled: true },
+  trustedOrigins: ['http://localhost:5173'],
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        defaultValue: 'user',
+        input: false,
+      },
+    },
   },
 })

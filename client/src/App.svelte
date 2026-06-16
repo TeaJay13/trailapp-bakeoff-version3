@@ -1,17 +1,26 @@
 <script>
   import { session } from './stores/user.js'
-  import { currentPage } from './stores/trail.js'
+  import { currentPage, favoriteIds } from './stores/trail.js'
+  import { fetchFavoriteIds } from './lib/api.js'
   import Navbar from './components/Navbar.svelte'
   import TrailList from './pages/TrailList.svelte'
   import TrailDetail from './pages/TrailDetail.svelte'
   import TrailForm from './pages/TrailForm.svelte'
   import Login from './pages/Login.svelte'
   import Signup from './pages/Signup.svelte'
+  import Favorites from './pages/Favorites.svelte'
 
   $: if (!$session.isPending && !$session.data) {
     if ($currentPage === 'create' || $currentPage === 'edit') {
       $currentPage = 'login'
     }
+    favoriteIds.set(new Set())
+  }
+
+  $: if ($session.data) {
+    fetchFavoriteIds().then(ids => {
+      if (Array.isArray(ids)) favoriteIds.set(new Set(ids))
+    })
   }
 </script>
 
@@ -27,6 +36,8 @@
   <TrailForm />
 {:else if $currentPage === 'edit'}
   <TrailForm isEdit={true} />
+{:else if $currentPage === 'favorites'}
+  <Favorites />
 {:else if $currentPage === 'login'}
   <Login />
 {:else if $currentPage === 'signup'}

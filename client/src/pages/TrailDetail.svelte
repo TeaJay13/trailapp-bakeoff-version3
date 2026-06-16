@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
-  import { fetchTrail, deleteTrail } from '../lib/api.js'
-  import { currentPage, selectedTrailId } from '../stores/trail.js'
+  import { fetchTrail, deleteTrail, addFavorite, removeFavorite, deleteReview } from '../lib/api.js'
+  import { currentPage, selectedTrailId, favoriteIds } from '../stores/trail.js'
   import { session } from '../stores/user.js'
   import ReviewForm from '../components/ReviewForm.svelte'
   import ReviewList from '../components/ReviewList.svelte'
@@ -32,11 +32,46 @@
     $currentPage = 'home'
   }
 
+  let editingReview = null
+
   function handleReviewSubmitted(e) {
     reviews = [e.detail, ...reviews]
   }
 
+  function handleReviewUpdated(e) {
+    reviews = reviews.map(r => r.id === e.detail.id ? e.detail : r)
+    editingReview = null
+  }
+
+  function handleReviewDeleted(e) {
+    reviews = reviews.filter(r => r.id !== e.detail)
+    editingReview = null
+  }
+
+  function handleEditReview(e) {
+    editingReview = e.detail
+  }
+
+  async function handleAdminDeleteReview(e) {
+    if (!confirm('Delete this review?')) return
+    await deleteReview(trail.id, e.detail.id)
+    reviews = reviews.filter(r => r.id !== e.detail.id)
+  }
+
   $: isOwner = $session.data?.user?.id === trail?.created_by
+  $: isAdmin = $session.data?.user?.role === 'admin'
+  $: myReview = reviews.find(r => r.user_id === $session.data?.user?.id) ?? null
+  $: isFavorited = trail ? $favoriteIds.has(trail.id) : false
+
+  async function toggleFavorite() {
+    if (isFavorited) {
+      await removeFavorite(trail.id)
+      favoriteIds.update(s => { s.delete(trail.id); return new Set(s) })
+    } else {
+      await addFavorite(trail.id)
+      favoriteIds.update(s => new Set(s).add(trail.id))
+    }
+  }
 </script>
 
 <div class="page-container">
@@ -53,12 +88,21 @@
         <h1>{trail.name}</h1>
         <span class="badge {trail.difficulty}">{trail.difficulty}</span>
       </div>
-      {#if isOwner}
-        <div class="detail-actions">
+      <div class="detail-actions">
+        {#if $session.data}
+          <button class="fav-btn fav-btn-labeled" on:click={toggleFavorite}>
+            <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              fill={isFavorited ? 'currentColor' : 'none'}>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {isFavorited ? 'Saved' : 'Add to Favorites'}
+          </button>
+        {/if}
+        {#if isOwner || isAdmin}
           <button class="btn-secondary" on:click={() => $currentPage = 'edit'}>Edit</button>
           <button class="btn-danger" on:click={handleDelete}>Delete</button>
-        </div>
-      {/if}
+        {/if}
+      </div>
     </div>
 
     {#if trail.image_url}
@@ -95,14 +139,25 @@
 
     <hr class="divider" />
 
-    <section class="reviews-section">
-      <h2>Reviews</h2>
-      {#if $session.data}
-        <ReviewForm trailId={trail.id} on:submitted={handleReviewSubmitted} />
-      {:else}
-        <p class="status-msg"><button class="link-btn" on:click={() => $currentPage = 'login'}>Log in</button> to leave a review.</p>
-      {/if}
-      <ReviewList {reviews} />
-    </section>
+    {#if $session.data}
+      <section class="reviews-section">
+        <h2>Reviews</h2>
+        <ReviewForm
+          trailId={trail.id}
+          existingReview={editingReview ?? myReview}
+          on:submitted={handleReviewSubmitted}
+          on:updated={handleReviewUpdated}
+          on:deleted={handleReviewDeleted}
+        />
+        <ReviewList {reviews} on:edit={handleEditReview} on:admindelete={handleAdminDeleteReview} />
+      </section>
+    {:else}
+      <section class="reviews-section">
+        <h2>Reviews</h2>
+        <p class="status-msg">
+          <button class="link-btn" on:click={() => $currentPage = 'login'}>Sign in</button> to read and leave reviews.
+        </p>
+      </section>
+    {/if}
   {/if}
 </div>

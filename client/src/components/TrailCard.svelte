@@ -1,11 +1,24 @@
 <script>
-  import { currentPage, selectedTrailId } from '../stores/trail.js'
+  import { currentPage, selectedTrailId, favoriteIds } from '../stores/trail.js'
+  import { session } from '../stores/user.js'
+  import { addFavorite, removeFavorite } from '../lib/api.js'
 
   export let trail
 
   function viewTrail() {
     $selectedTrailId = trail.id
     $currentPage = 'detail'
+  }
+
+  async function toggleFavorite(e) {
+    e.stopPropagation()
+    if ($favoriteIds.has(trail.id)) {
+      await removeFavorite(trail.id)
+      favoriteIds.update(s => { s.delete(trail.id); return new Set(s) })
+    } else {
+      await addFavorite(trail.id)
+      favoriteIds.update(s => new Set(s).add(trail.id))
+    }
   }
 </script>
 
@@ -19,6 +32,14 @@
         <img src={trail.image_url} alt={trail.name} loading="lazy" />
       </picture>
       <span class="badge {trail.difficulty} card-badge">{trail.difficulty}</span>
+      {#if $session.data}
+        <button class="fav-btn card-fav" on:click={toggleFavorite} aria-label="Favorite">
+          <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            fill={$favoriteIds.has(trail.id) ? 'currentColor' : 'none'}>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+      {/if}
     </div>
   {:else}
     <div class="card-header">

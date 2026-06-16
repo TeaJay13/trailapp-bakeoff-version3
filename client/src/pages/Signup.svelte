@@ -5,16 +5,26 @@
   let name = ''
   let email = ''
   let password = ''
+  let confirmPassword = ''
   let error = ''
   let submitting = false
 
   async function handleSignup() {
-    submitting = true
     error = ''
-    const { error: err } = await authClient.signUp.email({ name, email, password })
-    submitting = false
-    if (err) { error = err.message; return }
-    $currentPage = 'home'
+    if (password !== confirmPassword) {
+      error = 'Passwords do not match.'
+      return
+    }
+    submitting = true
+    try {
+      const { data, error: err } = await authClient.signUp.email({ name, email, password })
+      if (err) { error = err.message; return }
+      if (data) $currentPage = 'home'
+    } catch (e) {
+      error = e.message || 'Something went wrong. Please try again.'
+    } finally {
+      submitting = false
+    }
   }
 </script>
 
@@ -39,6 +49,10 @@
       <div class="form-group">
         <label for="password">Password</label>
         <input id="password" type="password" bind:value={password} placeholder="••••••••" minlength="8" required />
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input id="confirmPassword" type="password" bind:value={confirmPassword} placeholder="••••••••" required />
       </div>
       <button type="submit" class="btn-primary btn-full" disabled={submitting}>
         {submitting ? 'Creating account...' : 'Sign Up'}

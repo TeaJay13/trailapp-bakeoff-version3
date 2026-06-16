@@ -27,6 +27,7 @@
       <span class="nav-loading">...</span>
     {:else if $session.data}
       <span class="nav-user">Hi, {$session.data.user.name}</span>
+      <button class="btn-outline" on:click={() => $currentPage = 'favorites'}>Favorites</button>
       <button class="btn-outline" on:click={handleLogout}>Log Out</button>
     {:else}
       <button class="btn-outline" on:click={() => $currentPage = 'login'}>Log In</button>

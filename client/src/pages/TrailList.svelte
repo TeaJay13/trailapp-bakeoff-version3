@@ -22,7 +22,7 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Discover Trails</h1>
-    {#if $session.data}
+    {#if $session.data?.user?.role === 'admin'}
       <button class="btn-primary" on:click={() => $currentPage = 'create'}>+ Add Trail</button>
     {/if}
   </div>
@@ -46,7 +46,7 @@
   {#if loading}
     <p class="status-msg">Loading trails...</p>
   {:else if trails.length === 0}
-    <p class="status-msg">No trails found. {#if $session.data}Be the first to add one!{/if}</p>
+    <p class="status-msg">No trails found.</p>
   {:else}
     <div class="trail-grid">
       {#each trails as trail (trail.id)}
