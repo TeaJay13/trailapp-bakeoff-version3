@@ -9,6 +9,7 @@
   import Login from './pages/Login.svelte'
   import Signup from './pages/Signup.svelte'
   import Favorites from './pages/Favorites.svelte'
+  import Landing from './pages/Landing.svelte'
 
   $: if (!$session.isPending && !$session.data) {
     if ($currentPage === 'create' || $currentPage === 'edit') {
@@ -28,6 +29,8 @@
 
 {#if $session.isPending}
   <div class="page-container status-msg">Loading...</div>
+{:else if $currentPage === 'landing'}
+  <Landing />
 {:else if $currentPage === 'home'}
   <TrailList />
 {:else if $currentPage === 'detail'}

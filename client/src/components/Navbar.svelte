@@ -5,7 +5,7 @@
 
   function goHome() {
     $selectedTrailId = null
-    $currentPage = 'home'
+    $currentPage = 'landing'
   }
 
   async function handleLogout() {
