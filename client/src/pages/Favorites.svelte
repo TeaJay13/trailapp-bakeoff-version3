@@ -4,9 +4,9 @@
   import { currentPage, favoriteIds } from '../stores/trail.js'
   import TrailCard from '../components/TrailCard.svelte'
 
-  let trails = []
-  let loading = true
-  let error = ''
+  let trails = $state([])
+  let loading = $state(true)
+  let error = $state('')
 
   onMount(async () => {
     try {
@@ -18,15 +18,17 @@
     }
   })
 
-  $: if ($favoriteIds) {
-    trails = trails.filter(t => $favoriteIds.has(t.id))
-  }
+  $effect(() => {
+    if ($favoriteIds) {
+      trails = trails.filter(t => $favoriteIds.has(t.id))
+    }
+  })
 </script>
 
 <div class="page-container">
   <div class="page-header">
     <h1>My Favorites</h1>
-    <button class="btn-back" on:click={() => $currentPage = 'home'}>← Back to trails</button>
+    <button class="btn-back" onclick={() => $currentPage = 'home'}>← Back to trails</button>
   </div>
 
   {#if loading}

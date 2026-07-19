@@ -17,9 +17,9 @@
       <p class="hero-sub">Discover curated hiking trails, read honest community reviews, and save the routes you love.</p>
       <div class="hero-actions">
         {#if !$session.data && !$session.isPending}
-          <button class="hero-btn-primary" on:click={() => $currentPage = 'signup'}>Create Free Account</button>
+          <button class="hero-btn-primary" onclick={() => $currentPage = 'signup'}>Create Free Account</button>
         {/if}
-        <button class="hero-btn-outline" on:click={() => $currentPage = 'home'}>Browse Trails</button>
+        <button class="hero-btn-outline" onclick={() => $currentPage = 'home'}>Browse Trails</button>
       </div>
     </div>
   </section>
@@ -61,8 +61,8 @@
       <h2>Ready to explore?</h2>
       <p>Create a free account to unlock reviews and save your favorite trails.</p>
       <div class="cta-actions">
-        <button class="hero-btn-primary" on:click={() => $currentPage = 'signup'}>Get Started</button>
-        <button class="link-btn" on:click={() => $currentPage = 'login'}>Already have an account? Log in</button>
+        <button class="hero-btn-primary" onclick={() => $currentPage = 'signup'}>Get Started</button>
+        <button class="link-btn" onclick={() => $currentPage = 'login'}>Already have an account? Log in</button>
       </div>
     </section>
   {/if}

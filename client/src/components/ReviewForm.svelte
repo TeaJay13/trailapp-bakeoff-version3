@@ -1,26 +1,24 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
   import { createReview, updateReview, deleteReview } from '../lib/api.js'
 
-  export let trailId
-  export let existingReview = null
+  let { trailId, existingReview = null, onsubmitted, onupdated, ondeleted } = $props()
 
-  const dispatch = createEventDispatcher()
-
-  let rating = existingReview?.rating ?? 0
-  let hovered = 0
-  let comment = existingReview?.comment ?? ''
-  let submitting = false
-  let error = ''
+  let rating = $state(existingReview?.rating ?? 0)
+  let hovered = $state(0)
+  let comment = $state(existingReview?.comment ?? '')
+  let submitting = $state(false)
+  let error = $state('')
   let syncedId = existingReview?.id ?? null
 
-  $: isEdit = !!existingReview
+  let isEdit = $derived(!!existingReview)
 
-  $: if (existingReview?.id !== syncedId) {
-    syncedId = existingReview?.id ?? null
-    rating = existingReview?.rating ?? 0
-    comment = existingReview?.comment ?? ''
-  }
+  $effect(() => {
+    if (existingReview?.id !== syncedId) {
+      syncedId = existingReview?.id ?? null
+      rating = existingReview?.rating ?? 0
+      comment = existingReview?.comment ?? ''
+    }
+  })
 
   async function handleSubmit() {
     if (rating === 0) { error = 'Please select a star rating.'; return }
@@ -31,11 +29,11 @@
       if (isEdit) {
         const updated = await updateReview(trailId, existingReview.id, { rating, comment })
         if (updated.error) { error = updated.error; return }
-        dispatch('updated', updated)
+        onupdated?.(updated)
       } else {
         const res = await createReview(trailId, { rating, comment })
         if (res.error) { error = res.error; return }
-        dispatch('submitted', res)
+        onsubmitted?.(res)
         rating = 0
         comment = ''
       }
@@ -51,7 +49,7 @@
     submitting = true
     try {
       await deleteReview(trailId, existingReview.id)
-      dispatch('deleted', existingReview.id)
+      ondeleted?.(existingReview.id)
     } catch (err) {
       error = 'Failed to delete review.'
     } finally {
@@ -72,9 +70,9 @@
       <button
         type="button"
         class="star {star <= (hovered || rating) ? 'filled' : ''}"
-        on:click={() => rating = star}
-        on:mouseenter={() => hovered = star}
-        on:mouseleave={() => hovered = 0}
+        onclick={() => rating = star}
+        onmouseenter={() => hovered = star}
+        onmouseleave={() => hovered = 0}
         aria-label="{star} star"
       >★</button>
     {/each}
@@ -83,11 +81,11 @@
   <textarea bind:value={comment} rows="3" placeholder="Share your experience..."></textarea>
 
   <div class="review-form-actions">
-    <button class="btn-primary" on:click={handleSubmit} disabled={submitting}>
+    <button class="btn-primary" onclick={handleSubmit} disabled={submitting}>
       {submitting ? 'Saving...' : isEdit ? 'Update Review' : 'Submit Review'}
     </button>
     {#if isEdit}
-      <button class="btn-danger" on:click={handleDelete} disabled={submitting}>Delete</button>
+      <button class="btn-danger" onclick={handleDelete} disabled={submitting}>Delete</button>
     {/if}
   </div>
 </div>

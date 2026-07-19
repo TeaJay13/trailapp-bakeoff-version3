@@ -5,10 +5,10 @@
   import { session } from '../stores/user.js'
   import TrailCard from '../components/TrailCard.svelte'
 
-  let trails = []
-  let search = ''
-  let difficulty = ''
-  let loading = true
+  let trails = $state([])
+  let search = $state('')
+  let difficulty = $state('')
+  let loading = $state(true)
 
   async function load() {
     loading = true
@@ -23,7 +23,7 @@
   <div class="page-header">
     <h1>Discover Trails</h1>
     {#if $session.data?.user?.role === 'admin'}
-      <button class="btn-primary" on:click={() => $currentPage = 'create'}>+ Add Trail</button>
+      <button class="btn-primary" onclick={() => $currentPage = 'create'}>+ Add Trail</button>
     {/if}
   </div>
 
@@ -31,11 +31,11 @@
     <input
       type="text"
       bind:value={search}
-      on:input={load}
+      oninput={load}
       placeholder="Search trails..."
       class="search-input"
     />
-    <select bind:value={difficulty} on:change={load} class="filter-select">
+    <select bind:value={difficulty} onchange={load} class="filter-select">
       <option value="">All Difficulties</option>
       <option value="easy">Easy</option>
       <option value="moderate">Moderate</option>

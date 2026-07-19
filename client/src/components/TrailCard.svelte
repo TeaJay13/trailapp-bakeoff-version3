@@ -3,7 +3,7 @@
   import { session } from '../stores/user.js'
   import { addFavorite, removeFavorite } from '../lib/api.js'
 
-  export let trail
+  let { trail } = $props()
 
   function viewTrail() {
     $selectedTrailId = trail.id
@@ -22,7 +22,7 @@
   }
 </script>
 
-<div class="trail-card" on:click={viewTrail} on:keypress={viewTrail} role="button" tabindex="0">
+<div class="trail-card" onclick={viewTrail} onkeypress={viewTrail} role="button" tabindex="0">
   {#if trail.image_url}
     <div class="card-img">
       <picture>
@@ -33,7 +33,7 @@
       </picture>
       <span class="badge {trail.difficulty} card-badge">{trail.difficulty}</span>
       {#if $session.data}
-        <button class="fav-btn card-fav" on:click={toggleFavorite} aria-label="Favorite">
+        <button class="fav-btn card-fav" onclick={toggleFavorite} aria-label="Favorite">
           <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             fill={$favoriteIds.has(trail.id) ? 'currentColor' : 'none'}>
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -66,6 +66,6 @@
     {#if trail.description}
       <p class="card-desc">{trail.description.slice(0, 90)}{trail.description.length > 90 ? '…' : ''}</p>
     {/if}
-    <button class="btn-ghost" on:click|stopPropagation={viewTrail}>View Details →</button>
+    <button class="btn-ghost" onclick={(e) => { e.stopPropagation(); viewTrail() }}>View Details →</button>
   </div>
 </div>

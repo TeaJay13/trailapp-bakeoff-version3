@@ -3,15 +3,15 @@
   import { fetchTrail, createTrail, updateTrail } from '../lib/api.js'
   import { currentPage, selectedTrailId } from '../stores/trail.js'
 
-  export let isEdit = false
+  let { isEdit = false } = $props()
 
-  let name = ''
-  let description = ''
-  let difficulty = 'easy'
-  let length = ''
-  let location = ''
-  let error = ''
-  let submitting = false
+  let name = $state('')
+  let description = $state('')
+  let difficulty = $state('easy')
+  let length = $state('')
+  let location = $state('')
+  let error = $state('')
+  let submitting = $state(false)
 
   onMount(async () => {
     if (isEdit && $selectedTrailId) {
@@ -58,7 +58,7 @@
       <p class="form-error">{error}</p>
     {/if}
 
-    <form on:submit|preventDefault={handleSubmit}>
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit() }}>
       <div class="form-group">
         <label for="name">Trail Name *</label>
         <input id="name" type="text" bind:value={name} placeholder="e.g. Pine Ridge Loop" required />
@@ -90,7 +90,7 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-secondary" on:click={handleCancel}>Cancel</button>
+        <button type="button" class="btn-secondary" onclick={handleCancel}>Cancel</button>
         <button type="submit" class="btn-primary" disabled={submitting}>
           {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Trail'}
         </button>

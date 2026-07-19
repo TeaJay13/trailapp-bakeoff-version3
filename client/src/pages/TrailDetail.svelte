@@ -6,16 +6,17 @@
   import ReviewForm from '../components/ReviewForm.svelte'
   import ReviewList from '../components/ReviewList.svelte'
 
-  let trail = null
-  let reviews = []
-  let loading = true
-  let error = ''
+  let trail = $state(null)
+  let reviews = $state([])
+  let loading = $state(true)
+  let error = $state('')
+  let editingReview = $state(null)
 
   onMount(async () => {
     try {
       const [t, r] = await Promise.all([
         fetchTrail($selectedTrailId),
-        fetch(`/api/trails/${$selectedTrailId}/reviews`, { credentials: 'include' }).then(res => res.json()),
+        fetch(`${import.meta.env.VITE_API_URL || ''}/api/trails/${$selectedTrailId}/reviews`, { credentials: 'include' }).then(res => res.json()),
       ])
       trail = t
       reviews = r
@@ -32,36 +33,34 @@
     $currentPage = 'home'
   }
 
-  let editingReview = null
-
-  function handleReviewSubmitted(e) {
-    reviews = [e.detail, ...reviews]
+  function handleReviewSubmitted(review) {
+    reviews = [review, ...reviews]
   }
 
-  function handleReviewUpdated(e) {
-    reviews = reviews.map(r => r.id === e.detail.id ? e.detail : r)
+  function handleReviewUpdated(review) {
+    reviews = reviews.map(r => r.id === review.id ? review : r)
     editingReview = null
   }
 
-  function handleReviewDeleted(e) {
-    reviews = reviews.filter(r => r.id !== e.detail)
+  function handleReviewDeleted(id) {
+    reviews = reviews.filter(r => r.id !== id)
     editingReview = null
   }
 
-  function handleEditReview(e) {
-    editingReview = e.detail
+  function handleEditReview(review) {
+    editingReview = review
   }
 
-  async function handleAdminDeleteReview(e) {
+  async function handleAdminDeleteReview(review) {
     if (!confirm('Delete this review?')) return
-    await deleteReview(trail.id, e.detail.id)
-    reviews = reviews.filter(r => r.id !== e.detail.id)
+    await deleteReview(trail.id, review.id)
+    reviews = reviews.filter(r => r.id !== review.id)
   }
 
-  $: isOwner = $session.data?.user?.id === trail?.created_by
-  $: isAdmin = $session.data?.user?.role === 'admin'
-  $: myReview = reviews.find(r => r.user_id === $session.data?.user?.id) ?? null
-  $: isFavorited = trail ? $favoriteIds.has(trail.id) : false
+  let isOwner = $derived($session.data?.user?.id === trail?.created_by)
+  let isAdmin = $derived($session.data?.user?.role === 'admin')
+  let myReview = $derived(reviews.find(r => r.user_id === $session.data?.user?.id) ?? null)
+  let isFavorited = $derived(trail ? $favoriteIds.has(trail.id) : false)
 
   async function toggleFavorite() {
     if (isFavorited) {
@@ -75,7 +74,7 @@
 </script>
 
 <div class="page-container">
-  <button class="btn-back" on:click={() => $currentPage = 'home'}>← Back to trails</button>
+  <button class="btn-back" onclick={() => $currentPage = 'home'}>← Back to trails</button>
 
   {#if loading}
     <p class="status-msg">Loading...</p>
@@ -90,7 +89,7 @@
       </div>
       <div class="detail-actions">
         {#if $session.data}
-          <button class="fav-btn fav-btn-labeled" on:click={toggleFavorite}>
+          <button class="fav-btn fav-btn-labeled" onclick={toggleFavorite}>
             <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               fill={isFavorited ? 'currentColor' : 'none'}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -99,8 +98,8 @@
           </button>
         {/if}
         {#if isOwner || isAdmin}
-          <button class="btn-secondary" on:click={() => $currentPage = 'edit'}>Edit</button>
-          <button class="btn-danger" on:click={handleDelete}>Delete</button>
+          <button class="btn-secondary" onclick={() => $currentPage = 'edit'}>Edit</button>
+          <button class="btn-danger" onclick={handleDelete}>Delete</button>
         {/if}
       </div>
     </div>
@@ -145,17 +144,17 @@
         <ReviewForm
           trailId={trail.id}
           existingReview={editingReview ?? myReview}
-          on:submitted={handleReviewSubmitted}
-          on:updated={handleReviewUpdated}
-          on:deleted={handleReviewDeleted}
+          onsubmitted={handleReviewSubmitted}
+          onupdated={handleReviewUpdated}
+          ondeleted={handleReviewDeleted}
         />
-        <ReviewList {reviews} on:edit={handleEditReview} on:admindelete={handleAdminDeleteReview} />
+        <ReviewList {reviews} onedit={handleEditReview} onadmindelete={handleAdminDeleteReview} />
       </section>
     {:else}
       <section class="reviews-section">
         <h2>Reviews</h2>
         <p class="status-msg">
-          <button class="link-btn" on:click={() => $currentPage = 'login'}>Sign in</button> to read and leave reviews.
+          <button class="link-btn" onclick={() => $currentPage = 'login'}>Sign in</button> to read and leave reviews.
         </p>
       </section>
     {/if}

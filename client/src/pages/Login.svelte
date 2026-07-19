@@ -2,10 +2,10 @@
   import { authClient } from '../lib/auth.js'
   import { currentPage } from '../stores/trail.js'
 
-  let email = ''
-  let password = ''
-  let error = ''
-  let submitting = false
+  let email = $state('')
+  let password = $state('')
+  let error = $state('')
+  let submitting = $state(false)
 
   async function handleLogin() {
     submitting = true
@@ -26,7 +26,7 @@
       <p class="form-error">{error}</p>
     {/if}
 
-    <form on:submit|preventDefault={handleLogin}>
+    <form onsubmit={(e) => { e.preventDefault(); handleLogin() }}>
       <div class="form-group">
         <label for="email">Email</label>
         <input id="email" type="email" bind:value={email} placeholder="you@example.com" required />
@@ -42,7 +42,7 @@
 
     <p class="auth-switch">
       No account?
-      <button class="link-btn" on:click={() => $currentPage = 'signup'}>Sign up</button>
+      <button class="link-btn" onclick={() => $currentPage = 'signup'}>Sign up</button>
     </p>
   </div>
 </div>

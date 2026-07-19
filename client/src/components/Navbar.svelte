@@ -10,12 +10,12 @@
 
   async function handleLogout() {
     await authClient.signOut()
-    $currentPage = 'home'
+    $currentPage = 'landing'
   }
 </script>
 
 <nav class="navbar">
-  <button class="brand" on:click={goHome}>
+  <button class="brand" onclick={goHome}>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <polyline points="22 12 17 2 12 12 7 6 2 12"/>
       <line x1="2" y1="20" x2="22" y2="20"/>
@@ -27,11 +27,11 @@
       <span class="nav-loading">...</span>
     {:else if $session.data}
       <span class="nav-user">Hi, {$session.data.user.name}</span>
-      <button class="btn-outline" on:click={() => $currentPage = 'favorites'}>Favorites</button>
-      <button class="btn-outline" on:click={handleLogout}>Log Out</button>
+      <button class="btn-outline" onclick={() => $currentPage = 'favorites'}>Favorites</button>
+      <button class="btn-outline" onclick={handleLogout}>Log Out</button>
     {:else}
-      <button class="btn-outline" on:click={() => $currentPage = 'login'}>Log In</button>
-      <button class="btn-primary" on:click={() => $currentPage = 'signup'}>Sign Up</button>
+      <button class="btn-outline" onclick={() => $currentPage = 'login'}>Log In</button>
+      <button class="btn-primary" onclick={() => $currentPage = 'signup'}>Sign Up</button>
     {/if}
   </div>
 </nav>

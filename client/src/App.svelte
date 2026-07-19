@@ -11,18 +11,22 @@
   import Favorites from './pages/Favorites.svelte'
   import Landing from './pages/Landing.svelte'
 
-  $: if (!$session.isPending && !$session.data) {
-    if ($currentPage === 'create' || $currentPage === 'edit') {
-      $currentPage = 'login'
+  $effect(() => {
+    if (!$session.isPending && !$session.data) {
+      if ($currentPage === 'create' || $currentPage === 'edit') {
+        currentPage.set('login')
+      }
+      favoriteIds.set(new Set())
     }
-    favoriteIds.set(new Set())
-  }
+  })
 
-  $: if ($session.data) {
-    fetchFavoriteIds().then(ids => {
-      if (Array.isArray(ids)) favoriteIds.set(new Set(ids))
-    })
-  }
+  $effect(() => {
+    if ($session.data) {
+      fetchFavoriteIds().then(ids => {
+        if (Array.isArray(ids)) favoriteIds.set(new Set(ids))
+      })
+    }
+  })
 </script>
 
 <Navbar />
